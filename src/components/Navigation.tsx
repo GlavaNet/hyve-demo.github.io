@@ -124,7 +124,7 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
           </div>
         )}
       </nav>
-      <div className="h-20" aria-hidden="true" />
+      <div className="h-24" aria-hidden="true" />
     </header>
   );
 };
