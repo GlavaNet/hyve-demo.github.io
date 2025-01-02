@@ -10,13 +10,11 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
     []
   );
 
-  // Memoize navigation items
   const navItems = useMemo(() => [
     { id: 'home', label: 'Home', ariaLabel: 'Go to home page' },
     { id: 'contact', label: 'Contact', ariaLabel: 'Go to contact page' }
   ], []);
 
-  // Handle page change with validation
   const handleNavClick = useCallback((navId: string) => {
     if (navItems.some(item => item.id === navId)) {
       setPage(navId);
@@ -24,7 +22,6 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
     }
   }, [setPage, navItems]);
 
-  // Handle keyboard navigation
   const handleKeyPress = useCallback((event: React.KeyboardEvent, navId: string) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -32,7 +29,6 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
     }
   }, [handleNavClick]);
 
-  // Close menu on escape key
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && menuOpen) {
@@ -42,19 +38,6 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [menuOpen]);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (menuOpen && !target.closest('[data-nav-menu]')) {
-        setMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
   return (
@@ -68,7 +51,6 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
         className="max-w-5xl mx-auto px-4 py-4"
       >
         <div className="flex justify-between items-center">
-          {/* Logo and Business Name */}
           <div className="flex items-center gap-3">
             {import.meta.env.VITE_LOGO_URL && (
               <img 
@@ -80,10 +62,7 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
                 height="32"
               />
             )}
-            <span 
-              className="text-xl font-semibold dark:text-white transition-colors"
-              itemProp="name"
-            >
+            <span className="text-xl font-semibold dark:text-white transition-colors">
               {businessName}
             </span>
           </div>
@@ -91,32 +70,28 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
           <div className="flex items-center gap-4">
             <ThemeToggle />
             
-            {/* Mobile menu button */}
             <button 
               onClick={() => setMenuOpen(!menuOpen)}
-              className="block md:hidden p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              className="block md:hidden p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
-              aria-label="Toggle navigation menu"
+              aria-label="Toggle menu"
             >
               <Menu size={24} aria-hidden="true" />
             </button>
             
-            {/* Desktop navigation */}
-            <div className="hidden md:flex gap-6" role="menubar">
+            <div className="hidden md:flex gap-6">
               {navItems.map((item) => (
                 <button 
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
                   onKeyDown={(e) => handleKeyPress(e, item.id)}
-                  className={`px-4 py-2 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ${
+                  className={`px-4 py-2 rounded-md transition-colors ${
                     page === item.id 
                       ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' 
                       : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
                   }`}
-                  role="menuitem"
                   aria-current={page === item.id ? 'page' : undefined}
-                  aria-label={item.ariaLabel}
                 >
                   {item.label}
                 </button>
@@ -125,38 +100,31 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
           </div>
         </div>
         
-        {/* Mobile navigation */}
-        <div 
-          id="mobile-menu"
-          className={`md:hidden border-t border-gray-100 dark:border-gray-800 transition-opacity duration-200 ${
-            menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-          role="menu"
-          aria-label="Mobile navigation"
-          data-nav-menu
-        >
-          <div className="px-4 py-2 space-y-1">
-            {navItems.map((item) => (
-              <button 
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                onKeyDown={(e) => handleKeyPress(e, item.id)}
-                className={`block w-full text-left px-4 py-2 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 ${
-                  page === item.id 
-                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' 
-                    : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
-                }`}
-                role="menuitem"
-                aria-current={page === item.id ? 'page' : undefined}
-                aria-label={item.ariaLabel}
-              >
-                {item.label}
-              </button>
-            ))}
+        {menuOpen && (
+          <div 
+            id="mobile-menu"
+            className="md:hidden border-t border-gray-100 dark:border-gray-800"
+          >
+            <div className="px-4 py-2 space-y-1">
+              {navItems.map((item) => (
+                <button 
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  onKeyDown={(e) => handleKeyPress(e, item.id)}
+                  className={`block w-full text-left px-4 py-2 rounded-md ${
+                    page === item.id 
+                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white' 
+                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </nav>
-      <div className="h-16" aria-hidden="true" />
+      <div className="h-20" aria-hidden="true" />
     </header>
   );
 };
