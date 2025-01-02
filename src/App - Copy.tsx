@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { InstagramGrid } from './components/InstagramGrid';
 import { ContactInfo } from './components/ContactInfo';
-import Footer from './components/Footer'; // Note this is a default import
+import { Footer } from './components/Footer';
 
 const App = () => {
   const [page, setPage] = useState('home');

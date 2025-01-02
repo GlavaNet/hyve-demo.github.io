@@ -7,7 +7,27 @@ export interface InstagramPost {
   caption?: string;
 }
 
-export interface NavProps {
+export interface NavigationProps {
   page: string;
   setPage: (page: string) => void;
+  className?: string;
+}
+
+export interface ContactInfoProps {
+  className?: string;
+}
+
+export interface InstagramGridProps {
+  className?: string;
+}
+
+export interface ThemeToggleProps {
+  className?: string;
+}
+
+// Add to existing types.ts
+declare global {
+  interface WindowEventMap {
+    themeChange: CustomEvent<'light' | 'dark'>;
+  }
 }
