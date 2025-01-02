@@ -61,7 +61,7 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
 
   return (
     <div 
-    className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-8 sm:pt-4 ${className}`.trim()}
+    className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-16 sm:pt-4 ${className}`.trim()}
       role="feed"
       aria-label="Instagram posts"
     >
