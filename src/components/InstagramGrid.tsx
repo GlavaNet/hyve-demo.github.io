@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Instagram } from 'lucide-react';
 import { fetchInstagramPosts } from '../lib/instagram';
 import type { InstagramPost, InstagramGridProps } from '../lib/types';
