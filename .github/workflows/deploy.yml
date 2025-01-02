@@ -27,6 +27,7 @@ jobs:
           VITE_CONTACT_PHONE: ${{ secrets.VITE_CONTACT_PHONE }}
           VITE_BIO: ${{ secrets.VITE_BIO }}
           VITE_PORTFOLIO_URL: ${{ secrets.VITE_PORTFOLIO_URL }}
+          VITE_DESIGNER_NAME: ${{ secrets.VITE_DESIGNER_NAME }}
         run: npm run build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
