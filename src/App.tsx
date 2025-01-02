@@ -18,7 +18,11 @@ const App = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors flex flex-col">
       <Navigation page={page} setPage={setPage} />
-      <main className="flex-grow pt-40 sm:pt-28 px-4 max-w-5xl mx-auto w-full">
+      <main className={`flex-grow px-4 max-w-5xl mx-auto w-full ${
+        page === 'home' 
+          ? 'pt-40 sm:pt-32' // Instagram grid padding
+          : 'pt-36 sm:pt-32' // Contact page padding
+      }`}>
         {page === 'home' ? <InstagramGrid /> : <ContactInfo />}
       </main>
       <Footer />
