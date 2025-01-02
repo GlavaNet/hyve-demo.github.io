@@ -20,7 +20,7 @@ const App = () => {
       <Navigation page={page} setPage={setPage} />
       <main className={`flex-grow px-4 max-w-5xl mx-auto w-full ${
         page === 'home' 
-          ? 'pt-40 sm:pt-32' // Instagram grid padding
+          ? 'pt-40 sm:pt-40' // Instagram grid padding
           : 'pt-36 sm:pt-32' // Contact page padding
       }`}>
         {page === 'home' ? <InstagramGrid /> : <ContactInfo />}
