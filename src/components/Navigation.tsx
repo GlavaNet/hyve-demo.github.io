@@ -52,17 +52,17 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
       >
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            {import.meta.env.VITE_LOGO_URL && (
-              <img 
-                // src={import.meta.env.VITE_LOGO_URL}
-                src="/public/images/hyve-logo.png"
-                alt={`${businessName} logo`}
-                className="h-8 w-auto object-contain"
-                loading="eager"
-                width="32"
-                height="32"
-              />
-            )}
+          {/* Logo is optional */}
+            <img 
+              src="/images/logo.png"
+              alt={`${businessName} logo`}
+              className="h-8 w-auto object-contain"
+              loading="eager"
+              width="32"
+              height="32"
+              onError={(e) => e.currentTarget.style.display = 'none'}
+            />
+            {/* Business name will always show */}
             <span className="text-xl font-semibold dark:text-white transition-colors">
               {businessName}
             </span>
