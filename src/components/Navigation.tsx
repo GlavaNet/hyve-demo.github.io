@@ -56,10 +56,10 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
             <img 
               src="/hyve-demo.github.io/images/hyve-logo.png"
               alt={`${businessName} logo`}
-              className="h-8 w-auto object-contain"
+              className="h-12 w-auto object-contain"
               loading="eager"
-              width="32"
-              height="32"
+              width="48"
+              height="48"
               onError={(e) => {
                 console.error('Logo failed to load:', e.currentTarget.src);
                 e.currentTarget.style.display = 'none';
