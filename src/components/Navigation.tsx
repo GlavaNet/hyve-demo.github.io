@@ -54,7 +54,7 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
           <div className="flex items-center gap-3">
           {/* Logo is optional */}
             <img 
-              src="/images/logo.png"
+              src="/images/hyve-logo.png"
               alt={`${businessName} logo`}
               className="h-8 w-auto object-contain"
               loading="eager"
