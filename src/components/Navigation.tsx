@@ -60,7 +60,11 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
               loading="eager"
               width="32"
               height="32"
-              onError={(e) => e.currentTarget.style.display = 'none'}
+              onError={(e) => {
+                console.log('Logo failed to load');
+                e.currentTarget.style.display = 'none';
+              }}
+              onLoad={() => console.log('Logo loaded successfully')}
             />
             {/* Business name will always show */}
             <span className="text-xl font-semibold dark:text-white transition-colors">
