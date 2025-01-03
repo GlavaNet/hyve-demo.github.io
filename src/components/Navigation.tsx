@@ -54,7 +54,8 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
           <div className="flex items-center gap-3">
             {import.meta.env.VITE_LOGO_URL && (
               <img 
-                src={import.meta.env.VITE_LOGO_URL}
+                // src={import.meta.env.VITE_LOGO_URL}
+                src="/images/hyve-logo.png"
                 alt={`${businessName} logo`}
                 className="h-8 w-auto object-contain"
                 loading="eager"

@@ -16,7 +16,8 @@ export const ContactInfo = ({ className = '' }: ContactInfoProps) => {
       <div className="flex flex-col items-center text-center mb-8">
         <div className="w-48 h-48 mb-6 relative">
           <img 
-            src={contactInfo.headshot}
+            // src={contactInfo.headshot}
+            src="/images/headshot.png"
             alt="Profile headshot"
             className="w-full h-full object-cover rounded-full shadow-lg"
             loading="eager"
