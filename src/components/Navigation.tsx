@@ -1,9 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Menu } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
-import { NavigationProps } from '../lib/types';
 
-export const Navigation = ({ page, setPage, className = '' }: NavigationProps) => {
+interface NavigationProps {
+  page: string;
+  setPage: (page: string) => void;
+}
+
+export const Navigation = ({ page, setPage }: NavigationProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const businessName = useMemo(() => 
