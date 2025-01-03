@@ -33,12 +33,12 @@ export const Navigation = ({ page, setPage }: NavigationProps) => {
         <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img 
-              src="/hyve-demo.github.io/images/logo.png"
+              src="/hyve-demo.github.io/images/hyve-logo.png"
               alt={`${businessName} logo`}
-              className="h-12 w-auto object-contain"
+              className="h-16 w-auto object-contain"
               loading="eager"
-              width="48"
-              height="48"
+              width="64"
+              height="64"
               onError={(e) => {
                 console.error('Logo failed to load:', e.currentTarget.src);
                 e.currentTarget.style.display = 'none';
