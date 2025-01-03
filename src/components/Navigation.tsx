@@ -55,7 +55,7 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
             {import.meta.env.VITE_LOGO_URL && (
               <img 
                 // src={import.meta.env.VITE_LOGO_URL}
-                src="/images/hyve-logo.png"
+                src="/public/images/hyve-logo.png"
                 alt={`${businessName} logo`}
                 className="h-8 w-auto object-contain"
                 loading="eager"
