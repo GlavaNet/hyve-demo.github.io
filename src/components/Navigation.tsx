@@ -61,7 +61,7 @@ export const Navigation = ({ page, setPage, className = '' }: NavigationProps) =
               width="32"
               height="32"
               onError={(e) => {
-                console.log('Logo failed to load');
+                console.error('Logo failed to load:', e.currentTarget.src);
                 e.currentTarget.style.display = 'none';
               }}
               onLoad={() => console.log('Logo loaded successfully')}
