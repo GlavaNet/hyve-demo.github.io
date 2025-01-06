@@ -178,18 +178,26 @@ export const ContactInfo = () => {
             {services.map((service) => (
               <label 
                 key={service.id}
-                className="flex items-start p-3 border rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750
-                  ${formData.services.includes(service.id) ? 'border-blue-500 bg-blue-50 dark:bg-gray-700' : 'border-gray-200 dark:border-gray-700'}"
+                className={`flex items-start p-3 border rounded-md cursor-pointer transition-colors
+                  ${formData.services.includes(service.id) 
+                    ? 'border-blue-500 bg-blue-50 dark:bg-gray-700 dark:border-blue-400' 
+                    : 'border-gray-200 dark:border-gray-600 dark:hover:border-gray-500'}
+                  hover:bg-gray-50 dark:hover:bg-gray-700`}
               >
                 <input
                   type="checkbox"
                   checked={formData.services.includes(service.id)}
                   onChange={() => handleServiceToggle(service.id)}
-                  className="mt-1 h-4 w-4 text-blue-600 rounded"
+                  className="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-500
+                    focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700"
                 />
                 <div className="ml-3">
-                  <div className="font-medium dark:text-white">{service.label}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{service.description}</div>
+                  <div className="font-medium text-gray-900 dark:text-white">
+                    {service.label}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-300">
+                    {service.description}
+                  </div>
                 </div>
               </label>
             ))}
