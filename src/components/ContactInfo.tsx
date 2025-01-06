@@ -4,30 +4,51 @@ import { SendIcon } from 'lucide-react';
 interface FormData {
   name: string;
   email: string;
-  message: string;
+  services: string[];
 }
 
 interface FormErrors {
   name?: string;
   email?: string;
-  message?: string;
+  services?: string;
 }
 
 export const ContactInfo = () => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    message: ''
+    services: []
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // Input validation
+  const services = [
+    {
+      id: 'splicing',
+      label: 'Fiber Optic Splicing & Testing',
+      description: 'Comprehensive fiber optic testing services using advanced IOLM and OTDR technology'
+    },
+    {
+      id: 'fdh',
+      label: 'Fiber Distribution Hub Services',
+      description: 'End-to-end solutions for installation, maintenance, and distribution of fiber networks'
+    },
+    {
+      id: 'scada',
+      label: 'SCADA Network Installation',
+      description: 'Specialized installation of SCADA networks within power substations'
+    },
+    {
+      id: 'transfers',
+      label: 'Communications Transfer Services',
+      description: 'Telecommunications line transfers and pole violation resolution'
+    }
+  ];
+
   const validateForm = useCallback((data: FormData): FormErrors => {
     const errors: FormErrors = {};
     
-    // Name validation
     if (!data.name.trim()) {
       errors.name = 'Name is required';
     } else if (data.name.length > 100) {
@@ -36,30 +57,24 @@ export const ContactInfo = () => {
       errors.name = 'Name contains invalid characters';
     }
 
-    // Email validation
     if (!data.email.trim()) {
       errors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       errors.email = 'Invalid email format';
     }
 
-    // Message validation
-    if (!data.message.trim()) {
-      errors.message = 'Message is required';
-    } else if (data.message.length > 1000) {
-      errors.message = 'Message is too long (max 1000 characters)';
+    if (data.services.length === 0) {
+      errors.services = 'Please select at least one service';
     }
 
     return errors;
   }, []);
 
-  // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
 
-    // Validate form
     const formErrors = validateForm(formData);
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
@@ -68,18 +83,22 @@ export const ContactInfo = () => {
     }
 
     try {
-      // Replace with your FormSpree endpoint
       const response = await fetch('https://formspree.io/f/your-form-id', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          services: formData.services.map(id => 
+            services.find(s => s.id === id)?.label
+          )
+        })
       });
 
       if (response.ok) {
         setSubmitStatus('success');
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: '', email: '', services: [] });
       } else {
         setSubmitStatus('error');
       }
@@ -91,10 +110,19 @@ export const ContactInfo = () => {
     }
   };
 
+  const handleServiceToggle = (serviceId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      services: prev.services.includes(serviceId)
+        ? prev.services.filter(id => id !== serviceId)
+        : [...prev.services, serviceId]
+    }));
+  };
+
   return (
     <div className="max-w-xl mx-auto pt-8">
       <h2 className="text-2xl font-semibold mb-6 text-center dark:text-white">
-        Get in Touch
+        Request Our Services
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -143,24 +171,31 @@ export const ContactInfo = () => {
         </div>
 
         <div>
-          <label 
-            htmlFor="message"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Message
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Services Interested In
           </label>
-          <textarea
-            id="message"
-            name="message"
-            rows={4}
-            value={formData.message}
-            onChange={e => setFormData(prev => ({ ...prev, message: e.target.value }))}
-            className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 
-              dark:bg-gray-800 dark:border-gray-700 dark:text-white
-              ${errors.message ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
-          />
-          {errors.message && (
-            <p className="mt-1 text-sm text-red-500">{errors.message}</p>
+          <div className="space-y-3">
+            {services.map((service) => (
+              <label 
+                key={service.id}
+                className="flex items-start p-3 border rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750
+                  ${formData.services.includes(service.id) ? 'border-blue-500 bg-blue-50 dark:bg-gray-700' : 'border-gray-200 dark:border-gray-700'}"
+              >
+                <input
+                  type="checkbox"
+                  checked={formData.services.includes(service.id)}
+                  onChange={() => handleServiceToggle(service.id)}
+                  className="mt-1 h-4 w-4 text-blue-600 rounded"
+                />
+                <div className="ml-3">
+                  <div className="font-medium dark:text-white">{service.label}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{service.description}</div>
+                </div>
+              </label>
+            ))}
+          </div>
+          {errors.services && (
+            <p className="mt-1 text-sm text-red-500">{errors.services}</p>
           )}
         </div>
 
@@ -184,20 +219,20 @@ export const ContactInfo = () => {
           ) : (
             <span className="flex items-center justify-center">
               <SendIcon size={20} className="mr-2" />
-              Send Message
+              Submit Request
             </span>
           )}
         </button>
 
         {submitStatus === 'success' && (
           <div className="p-4 bg-green-100 text-green-700 rounded-md">
-            Thank you for your message! We'll get back to you soon.
+            Thank you for your interest! We'll get back to you soon about the selected services.
           </div>
         )}
 
         {submitStatus === 'error' && (
           <div className="p-4 bg-red-100 text-red-700 rounded-md">
-            Sorry, there was an error sending your message. Please try again later.
+            Sorry, there was an error sending your request. Please try again later.
           </div>
         )}
       </form>
