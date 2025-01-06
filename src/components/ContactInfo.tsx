@@ -1,5 +1,5 @@
 import { useState, FormEvent, useCallback } from 'react';
-import { Mail, SendIcon } from 'lucide-react';
+import { SendIcon } from 'lucide-react';
 
 interface FormData {
   name: string;
