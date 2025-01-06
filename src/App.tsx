@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { InstagramGrid } from './components/InstagramGrid';
 import { ContactInfo } from './components/ContactInfo';
+import { Services } from './components/Services';
 import { Footer } from './components/Footer';
 
 const App = () => {
@@ -20,10 +21,12 @@ const App = () => {
       <Navigation page={page} setPage={setPage} />
       <main className={`flex-grow px-4 max-w-5xl mx-auto w-full ${
         page === 'home' 
-          ? 'pt-40 sm:pt-40' // Instagram grid padding
-          : 'pt-36 sm:pt-32' // Contact page padding
+          ? 'pt-40 sm:pt-40'
+          : 'pt-36 sm:pt-32'
       }`}>
-        {page === 'home' ? <InstagramGrid /> : <ContactInfo />}
+        {page === 'home' && <InstagramGrid />}
+        {page === 'services' && <Services />}
+        {page === 'contact' && <ContactInfo />}
       </main>
       <Footer />
     </div>

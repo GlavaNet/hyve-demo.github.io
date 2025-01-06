@@ -33,6 +33,7 @@ export const Navigation = ({ page, setPage }: NavigationProps) => {
 
  const navItems = useMemo(() => [
    { id: 'home', label: 'Home', ariaLabel: 'Go to home page' },
+   { id: 'services', label: 'Services', ariaLabel: 'View our services' },
    { id: 'contact', label: 'Contact', ariaLabel: 'Go to contact page' }
  ], []);
 
