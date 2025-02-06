@@ -53,6 +53,10 @@ export const Services = () => {
                 alt={service.title}
                 className="w-full h-full object-cover"
                 loading="lazy"
+		onError={(e) => {
+			console.error(`Failed to load image for ${service.title}:`, e);
+			e.currentTarget.src = '/hyve-demo.github.io/images/placeholder.jpg';
+		}}
               />
             </div>
             
