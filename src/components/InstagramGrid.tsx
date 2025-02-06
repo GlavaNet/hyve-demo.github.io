@@ -26,6 +26,8 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
 
   useEffect(() => {
     loadPosts();
+    const interval = setInterval(loadPosts, 86400000); // Check every 24 hours
+    return () => clearInterval(interval);
   }, [loadPosts]);
 
   const renderPlaceholder = () => (
