@@ -55,7 +55,8 @@ export const Services = () => {
                 loading="lazy"
 		onError={(e) => {
 			console.error(`Failed to load image for ${service.title}:`, e);
-			e.currentTarget.src = '/hyve-demo.github.io/images/placeholder.jpg';
+			const placeholderSvg = `data:image/svg+xml,%3Csvg smlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6' /%3E%3Cpath d='M0 0h400v300H0z' fill='%23e5e7eb' fill-opacity='.5' /%3E%3Cpath d='M50 50h300v200H50z' fill='%23d1d5db' stroke='%239ca3af' stroke-width='2' /%3E%3C/svg%3E`;
+			e.currentTarget.src = placeholderSvg;
 		}}
               />
             </div>
