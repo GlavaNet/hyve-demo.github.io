@@ -50,7 +50,7 @@ export const Navigation = ({ page, setPage }: NavigationProps) => {
        <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
          <div className="flex items-center gap-3">
            <img 
-             src={`/hyve-demo.github.io/public/images/logo-${isDark ? 'dark' : 'light'}.png`}
+             src={`/images/logo-${isDark ? 'dark' : 'light'}.png`}
              alt={`${businessName} logo`}
              className="h-20 w-auto object-contain transition-opacity duration-300"
              loading="eager"
