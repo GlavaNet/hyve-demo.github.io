@@ -25,6 +25,29 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
   }, []);
 
   useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log("Fetching Instagram posts...");
+        const instagramPosts = await fetchInstagramPosts();
+        console.log("Instagram API response:", instagramPosts);
+        
+        if (instagramPosts && instagramPosts.length > 0) {
+          console.log("Posts received:", instagramPosts.length);
+          setPosts(instagramPosts);
+        } else {
+          console.log("No posts received or empty array");
+          setError('No Instagram posts found');
+        }
+      } catch (err) {
+        console.error('Error fetching Instagram posts:', err);
+        setError('Failed to load Instagram posts');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     loadPosts();
   }, [loadPosts]);
 
@@ -61,29 +84,37 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
 
   return (
     <div 
-    className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-16 sm:pt-4 ${className}`.trim()}
+      className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 ${className}`.trim()}
       role="feed"
       aria-label="Instagram posts"
     >
-      {posts.map((post) => (
-        <a 
-          key={post.id}
-          href={post.permalink}
-          className="aspect-square group relative"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src={post.media_url}
-            alt={post.caption || 'Instagram post'}
-            className="w-full h-full object-cover rounded-lg transition-transform group-hover:scale-[1.02]"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg">
-            <Instagram className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
-          </div>
-        </a>
-      ))}
+      {posts.map((post) => {
+        console.log("Rendering post:", post.id, post.media_url);
+        return (
+          <a 
+            key={post.id}
+            href={post.permalink}
+            className="aspect-square group relative"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={post.media_url}
+              alt={post.caption || 'Instagram post'}
+              className="w-full h-full object-cover rounded-lg transition-transform group-hover:scale-[1.02]"
+              loading="lazy"
+              onLoad={() => console.log("Image loaded:", post.id)}
+              onError={(e) => {
+                console.error("Image failed to load:", post.id, post.media_url);
+                e.currentTarget.src = '/images/placeholder.jpg';
+              }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg">
+              <Instagram className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
+            </div>
+          </a>
+        );
+      })}
     </div>
   );
 };
