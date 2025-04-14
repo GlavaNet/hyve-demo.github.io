@@ -25,32 +25,7 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
   }, []);
 
   useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log("Fetching Instagram posts...");
-        const instagramPosts = await fetchInstagramPosts();
-        console.log("Instagram API response:", instagramPosts);
-        
-        if (instagramPosts && instagramPosts.length > 0) {
-          console.log("Posts received:", instagramPosts.length);
-          setPosts(instagramPosts);
-        } else {
-          console.log("No posts received or empty array");
-          setError('No Instagram posts found');
-        }
-      } catch (err) {
-        console.error('Error fetching Instagram posts:', err);
-        setError('Failed to load Instagram posts');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadPosts();
-    const interval = setInterval(loadPosts, 86400000); // Check every 24 hours
-    return () => clearInterval(interval);
+
   }, [loadPosts]);
 
   const renderPlaceholder = () => (
