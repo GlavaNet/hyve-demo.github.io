@@ -12,30 +12,33 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
   try {
     console.log('Attempting to fetch Instagram posts...');
     
-    // Using your custom proxy endpoint
-    const response = await fetch('https://instagram-proxy.sabrastrain3.workers.dev/');
+    // Instagram Graph API endpoint for media
+    const instagramUrl = `https://graph.instagram.com/v12.0/${userId}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`;
+    
+    // Use the corsproxy.io service that worked in testing
+    const corsProxy = 'https://corsproxy.io/?';
+    const proxyUrl = `${corsProxy}${encodeURIComponent(instagramUrl)}`;
+    
+    console.log('Fetching from Instagram API through CORS proxy...');
+    const response = await fetch(proxyUrl);
     
     if (!response.ok) {
       throw new Error(`Instagram API responded with status: ${response.status}`);
     }
     
     const data = await response.json();
+    
+    // Check for auth errors specifically to provide better feedback
+    if (data.error && (data.error.type === 'OAuthException' || data.error.code === 190)) {
+      console.error('Instagram token has expired or been invalidated:', data.error.message);
+      throw new Error('Instagram token has expired or been invalidated. Please generate a new token.');
+    }
+    
     console.log(`Successfully fetched ${data.data?.length || 0} Instagram posts`);
     
-    // Add additional validation for the response structure
     if (!data || !data.data || !Array.isArray(data.data)) {
       console.error('Invalid Instagram API response format:', data);
       return [];
-    }
-    
-    // Log the first post for debugging (with sensitive info redacted)
-    if (data.data.length > 0) {
-      const samplePost = { ...data.data[0] };
-      if (samplePost.media_url) {
-        console.log('First post media URL exists');
-      } else {
-        console.warn('First post is missing media_url property');
-      }
     }
     
     return data.data || [];
@@ -43,4 +46,4 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
     console.error('Error fetching Instagram posts:', error);
     return [];
   }
-}
+};
