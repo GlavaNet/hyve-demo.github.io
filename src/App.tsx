@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { InstagramGrid } from './components/InstagramGrid';
-import { InstagramDebugger } from './components/InstagramDebugger';
+// import { InstagramDebugger } from './components/InstagramDebugger';
 import { ContactInfo } from './components/ContactInfo';
 import { Services } from './components/Services';
 import { Footer } from './components/Footer';
