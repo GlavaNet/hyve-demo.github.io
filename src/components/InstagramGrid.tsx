@@ -7,8 +7,6 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [useMockData, setUseMockData] = useState(false);
 
   // Function to create inline SVG placeholder content
@@ -24,7 +22,6 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
     try {
       setLoading(true);
       setError(null);
-      setErrorDetails(null);
       
       if (useMock) {
         try {
@@ -33,8 +30,6 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
           setPosts(mockPosts);
           setUseMockData(true);
         } catch (mockError) {
-          console.error('Error loading mock data:', mockError);
-          
           // Create fully inline fallback if mock images also fail
           const inlineMockPosts: InstagramPost[] = Array.from({ length: 6 }, (_, i) => ({
             id: `inline-mock-${i}`,
@@ -60,10 +55,7 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
         setError('No Instagram posts found');
       }
     } catch (err) {
-      console.error('Error fetching Instagram posts:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError('Could not load Instagram posts');
-      setErrorDetails(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -98,19 +90,6 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
       <div className="text-center p-4 max-w-lg mx-auto">
         <div className="mb-4">
           <h3 className="text-lg font-medium mb-2 text-red-600 dark:text-red-400">{error}</h3>
-          
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="text-sm text-blue-500 hover:underline"
-          >
-            {showDetails ? 'Hide details' : 'Show details'}
-          </button>
-          
-          {showDetails && errorDetails && (
-            <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 text-left text-xs text-gray-700 dark:text-gray-300 rounded">
-              {errorDetails}
-            </pre>
-          )}
         </div>
         
         <div className="flex flex-col sm:flex-row justify-center gap-3">
@@ -188,8 +167,7 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
               className="w-full h-full object-cover rounded-lg transition-transform group-hover:scale-[1.02]"
               loading="lazy"
               onError={(e) => {
-                console.error("Image failed to load:", post.id, post.media_url);
-                // Use our SVG generator as fallback
+                // Use our SVG generator as fallback without logging the error
                 e.currentTarget.src = generateSVGPlaceholder(index);
               }}
             />

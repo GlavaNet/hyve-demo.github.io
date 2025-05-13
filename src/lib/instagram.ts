@@ -1,140 +1,69 @@
 import { InstagramPost } from './types';
 
-// Debug-focused implementation for troubleshooting Instagram API issues
+// Production-ready implementation with secure handling of sensitive information
 export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
   const token = import.meta.env.VITE_INSTAGRAM_TOKEN;
   
   if (!token) {
-    console.warn('Instagram token is missing in environment variables');
+    // Generic error that doesn't reveal what's missing
+    console.warn('Missing required configuration for Instagram integration');
     return [];
   }
   
-  // Log token characteristics for debugging (without exposing the full token)
-  console.log('Token info:', {
-    length: token.length,
-    prefix: token.substring(0, 4),
-    suffix: token.substring(token.length - 4),
-    containsSpaces: token.includes(' '),
-    containsNewlines: token.includes('\n')
-  });
-  
-  // Try a very simple API endpoint first to verify basic connectivity
-  const corsProxy = 'https://corsproxy.io/?';
+  // Determine if we have a Basic Display API token without logging
+  const isBasicDisplayToken = token.startsWith('IGAA');
   
   try {
-    console.log('Testing basic Instagram API connectivity...');
+    // Use the appropriate endpoint based on token type
+    const instagramUrl = isBasicDisplayToken
+      ? `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`
+      : `https://graph.instagram.com/v13.0/${import.meta.env.VITE_INSTAGRAM_USER_ID}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`;
     
-    // Use the simplest endpoint possible
-    const testUrl = `https://graph.instagram.com/me?access_token=${token}`;
-    const proxyTestUrl = `${corsProxy}${encodeURIComponent(testUrl)}`;
+    // Use the CORS proxy without logging the full URL
+    const corsProxy = 'https://corsproxy.io/?';
+    const proxyUrl = `${corsProxy}${encodeURIComponent(instagramUrl)}`;
     
-    console.log('Making request to basic /me endpoint...');
-    const testResponse = await fetch(proxyTestUrl);
-    console.log('Response status:', testResponse.status);
+    const response = await fetch(proxyUrl);
     
-    if (!testResponse.ok) {
-      const errorText = await testResponse.text();
-      console.error('Error response:', errorText);
-      
-      try {
-        // Try to parse the error response
-        const errorData = JSON.parse(errorText);
-        console.error('Parsed error data:', errorData);
-        throw new Error(`Instagram API basic connectivity test failed: ${errorData.error?.message || 'Unknown error'}`);
-      } catch (parseError) {
-        throw new Error(`Instagram API basic connectivity test failed with status ${testResponse.status}`);
-      }
+    if (!response.ok) {
+      // Generic error without details in production
+      throw new Error(`Failed to fetch Instagram content`);
     }
     
-    const userData = await testResponse.json();
-    console.log('Basic user data:', userData);
+    const data = await response.json();
     
-    if (userData.error) {
-      throw new Error(`Instagram API error: ${userData.error.message}`);
+    // Check for API errors without logging the full response
+    if (data.error) {
+      throw new Error(`Instagram integration error`);
     }
     
-    // If we got here, basic connectivity works! Now try to fetch media
-    console.log('Basic connectivity successful, fetching media...');
-    
-    const mediaUrl = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}`;
-    const proxyMediaUrl = `${corsProxy}${encodeURIComponent(mediaUrl)}`;
-    
-    console.log('Making request to /me/media endpoint...');
-    const mediaResponse = await fetch(proxyMediaUrl);
-    console.log('Media response status:', mediaResponse.status);
-    
-    if (!mediaResponse.ok) {
-      const errorText = await mediaResponse.text();
-      console.error('Media error response:', errorText);
-      
-      try {
-        const errorData = JSON.parse(errorText);
-        console.error('Parsed media error data:', errorData);
-        throw new Error(`Instagram media fetch failed: ${errorData.error?.message || 'Unknown error'}`);
-      } catch (parseError) {
-        throw new Error(`Instagram media fetch failed with status ${mediaResponse.status}`);
-      }
-    }
-    
-    const mediaData = await mediaResponse.json();
-    console.log('Media response data:', mediaData);
-    
-    if (mediaData.error) {
-      throw new Error(`Instagram media API error: ${mediaData.error.message}`);
-    }
-    
-    if (!mediaData.data || !Array.isArray(mediaData.data)) {
-      console.warn('Valid response but unexpected format:', mediaData);
+    if (!data.data || !Array.isArray(data.data)) {
       return [];
     }
     
-    console.log(`Successfully fetched ${mediaData.data.length} Instagram posts`);
-    return mediaData.data;
+    return data.data;
   } catch (error) {
-    console.error('Error fetching Instagram posts:', error);
-    // Re-throw to let the component handle the error
-    throw error;
+    // Log error without exposing sensitive details
+    console.error('Instagram integration error:', 
+      error instanceof Error ? error.message : 'Unknown error');
+    return [];
   }
 };
 
-// Fallback implementation with local images rather than placeholder URLs
+// Fallback implementation with inline SVG placeholders
 export const fetchMockInstagramPosts = async (): Promise<InstagramPost[]> => {
-  console.log('Using local mock Instagram data...');
-  
-  // Simulate API latency
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Mock data using relative paths that should exist in public folder
-  const mockPosts: InstagramPost[] = [
-    {
-      id: 'mock1',
-      media_type: 'IMAGE',
-      media_url: './images/services/service1.jpg',
-      permalink: '#sample-1',
-      caption: 'Sample Instagram post 1'
-    },
-    {
-      id: 'mock2',
-      media_type: 'IMAGE',
-      media_url: './images/services/service2.jpg',
-      permalink: '#sample-2',
-      caption: 'Sample Instagram post 2'
-    },
-    {
-      id: 'mock3',
-      media_type: 'IMAGE',
-      media_url: './images/services/service3.jpg',
-      permalink: '#sample-3',
-      caption: 'Sample Instagram post 3'
-    },
-    {
-      id: 'mock4',
-      media_type: 'IMAGE',
-      media_url: './images/services/service4.jpg',
-      permalink: '#sample-4',
-      caption: 'Sample Instagram post 4'
-    }
-  ];
-  
-  return mockPosts;
+  // Generate SVG data URLs as placeholders
+  const generateSVGPlaceholder = (index: number) => {
+    const hue = (index * 55) % 360;
+    return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='hsl(${hue}, 70%25, 80%25)' /%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' fill='hsl(${hue}, 90%25, 30%25)' text-anchor='middle' dominant-baseline='middle'%3ESample ${index + 1}%3C/text%3E%3C/svg%3E`;
+  };
+
+  // Generate mock posts with inline SVG images
+  return Array.from({ length: 6 }, (_, i) => ({
+    id: `mock-${i}`,
+    media_type: 'IMAGE',
+    media_url: generateSVGPlaceholder(i),
+    permalink: '#sample-content',
+    caption: `Sample content ${i + 1}`
+  }));
 };
