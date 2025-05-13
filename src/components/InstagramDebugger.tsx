@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { testInstagramToken } from '../lib/instagramDirect';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 
-// This component can be temporarily added to your page for debugging
+// This is a simplified version of the Instagram Debugger component
 export const InstagramDebugger = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
@@ -10,13 +10,85 @@ export const InstagramDebugger = () => {
   const runTest = async () => {
     setLoading(true);
     try {
-      const result = await testInstagramToken();
-      setResults(result);
+      const token = import.meta.env.VITE_INSTAGRAM_TOKEN;
+      
+      if (!token) {
+        setResults({
+          success: false,
+          message: 'No Instagram token found in environment variables'
+        });
+        return;
+      }
+      
+      // Use a CORS proxy to make the request from the browser
+      const corsProxy = 'https://api.allorigins.win/get?url=';
+      
+      // Debug token endpoint
+      const debugUrl = `https://graph.facebook.com/debug_token?input_token=${token}&access_token=${token}`;
+      const encodedDebugUrl = encodeURIComponent(debugUrl);
+      const proxyDebugUrl = `${corsProxy}${encodedDebugUrl}`;
+      
+      console.log('Fetching token debug info...');
+      const debugResponse = await fetch(proxyDebugUrl);
+      const debugData = await debugResponse.json();
+      
+      let tokenInfo;
+      try {
+        tokenInfo = JSON.parse(debugData.contents);
+        console.log('Token debug info:', tokenInfo);
+      } catch (e) {
+        setResults({
+          success: false,
+          message: 'Failed to parse token debug response',
+          data: debugData
+        });
+        return;
+      }
+      
+      // Try to fetch media
+      const mediaUrl = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink&access_token=${token}&limit=1`;
+      const encodedMediaUrl = encodeURIComponent(mediaUrl);
+      const proxyMediaUrl = `${corsProxy}${encodedMediaUrl}`;
+      
+      console.log('Fetching Instagram media...');
+      const mediaResponse = await fetch(proxyMediaUrl);
+      const mediaData = await mediaResponse.json();
+      
+      let instagramData;
+      try {
+        instagramData = JSON.parse(mediaData.contents);
+        console.log('Instagram media response:', instagramData);
+      } catch (e) {
+        setResults({
+          success: false,
+          message: 'Failed to parse Instagram API response',
+          data: { tokenInfo, mediaData }
+        });
+        return;
+      }
+      
+      // Check for errors in the Instagram response
+      if (instagramData.error) {
+        setResults({
+          success: false,
+          message: `Instagram API error: ${instagramData.error.message}`,
+          data: { tokenInfo, instagramData }
+        });
+        return;
+      }
+      
+      // Success case
+      setResults({
+        success: true,
+        message: `Instagram connection successful. Token is valid and media can be fetched.`,
+        data: { tokenInfo, instagramData }
+      });
+      
     } catch (error) {
       setResults({
         success: false,
-        message: 'Error running test',
-        error: error instanceof Error ? error.message : String(error)
+        message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        error: error instanceof Error ? error.toString() : String(error)
       });
     } finally {
       setLoading(false);
@@ -27,9 +99,12 @@ export const InstagramDebugger = () => {
     <div className="max-w-2xl mx-auto p-4 my-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
       <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Instagram Connection Debugger</h2>
       
-      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-        This tool helps diagnose issues with your Instagram token. Click the button below to test your current token configuration.
-      </p>
+      <div className="flex items-center mb-4">
+        <AlertCircle size={18} className="text-yellow-500 mr-2" />
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          Use this tool to test your Instagram token and diagnose connection issues.
+        </p>
+      </div>
       
       <button
         onClick={runTest}
@@ -70,7 +145,7 @@ export const InstagramDebugger = () => {
       )}
       
       <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-        <p>Note: This component is for debugging only and should be removed in production.</p>
+        <p>Note: This debugger helps diagnose Instagram API connection issues.</p>
       </div>
     </div>
   );
