@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { InstagramGrid } from './components/InstagramGrid';
-// import { InstagramDebugger } from './components/InstagramDebugger';
 import { ContactInfo } from './components/ContactInfo';
 import { Services } from './components/Services';
 import { Footer } from './components/Footer';
@@ -25,11 +24,7 @@ const App = () => {
           ? 'pt-40 sm:pt-40'
           : 'pt-36 sm:pt-32'
       }`}>
-        {page === 'home' && (
-          <>
-            <InstagramGrid />
-          </>
-        )}
+        {page === 'home' && <InstagramGrid />}
         {page === 'services' && <Services />}
         {page === 'contact' && <ContactInfo />}
       </main>
