@@ -55,7 +55,11 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
         setError('No Instagram posts found');
       }
     } catch (err) {
+      // Set a user-friendly error message without exposing details
       setError('Could not load Instagram posts');
+      
+      // Log minimal error details to console for debugging
+      console.error('Instagram display error:', err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -167,7 +171,7 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
               className="w-full h-full object-cover rounded-lg transition-transform group-hover:scale-[1.02]"
               loading="lazy"
               onError={(e) => {
-                // Use our SVG generator as fallback without logging the error
+                // Use our SVG generator as fallback without verbose logging
                 e.currentTarget.src = generateSVGPlaceholder(index);
               }}
             />
