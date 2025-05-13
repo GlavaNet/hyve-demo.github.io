@@ -27,7 +27,7 @@ const App = () => {
       }`}>
         {page === 'home' && (
           <>
-            <InstagramDebugger />
+            // <InstagramDebugger />
             <InstagramGrid />
           </>
         )}
