@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 // This is a simplified version of the Instagram Debugger component
 export const InstagramDebugger = () => {
@@ -121,7 +121,7 @@ export const InstagramDebugger = () => {
       {results && (
         <div className="mt-4">
           <div className={`p-3 rounded-md ${
-            results.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            results.success ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
           }`}>
             <p className="font-medium">{results.success ? '✅ Success' : '❌ Error'}</p>
             <p>{results.message}</p>
@@ -130,7 +130,7 @@ export const InstagramDebugger = () => {
           <div className="mt-2">
             <button
               onClick={() => setExpanded(!expanded)}
-              className="text-sm text-blue-500 hover:text-blue-700"
+              className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
               {expanded ? 'Hide' : 'Show'} Technical Details
             </button>
