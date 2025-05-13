@@ -1,6 +1,6 @@
 import { InstagramPost } from './types';
 
-// Balanced implementation with security and functionality
+// Fixed implementation with proper parameter encoding
 export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
   const token = import.meta.env.VITE_INSTAGRAM_TOKEN;
   const userId = import.meta.env.VITE_INSTAGRAM_USER_ID;
@@ -14,11 +14,21 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
   const isBasicDisplayToken = token.startsWith('IGAA');
   
   try {
-    // For Basic Display API tokens, we use the /me endpoint
-    // For Graph API tokens, we use the /{user-id} endpoint
-    const instagramUrl = isBasicDisplayToken
-      ? `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`
-      : `https://graph.instagram.com/v13.0/${userId}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`;
+    // IMPORTANT: Build the URL differently to ensure proper parameter encoding
+    // Base URL without query parameters
+    const baseUrl = isBasicDisplayToken
+      ? 'https://graph.instagram.com/me/media'
+      : `https://graph.instagram.com/v13.0/${userId}/media`;
+    
+    // Create URLSearchParams object for proper parameter encoding
+    const params = new URLSearchParams({
+      fields: 'id,caption,media_type,media_url,thumbnail_url,permalink',
+      access_token: token,
+      limit: '12' // Ensure limit is a string to avoid encoding issues
+    });
+    
+    // Combine base URL with properly encoded parameters
+    const instagramUrl = `${baseUrl}?${params.toString()}`;
     
     // Use the corsproxy.io service
     const corsProxy = 'https://corsproxy.io/?';
@@ -27,10 +37,10 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
     const response = await fetch(proxyUrl);
     
     if (!response.ok) {
-      // Get enough error information to diagnose without oversharing
+      // Get error information to diagnose
       console.error(`Instagram API error: ${response.status}`);
       
-      // Try to get the error message without logging the entire response
+      // Try to get the error message
       try {
         const errorData = await response.json();
         if (errorData.error && errorData.error.message) {
