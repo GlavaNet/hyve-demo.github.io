@@ -1,28 +1,44 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Instagram } from 'lucide-react';
-import { fetchInstagramPosts } from '../lib/instagram';
+import { fetchInstagramPosts, fetchMockInstagramPosts } from '../lib/instagram';
 import type { InstagramPost, InstagramGridProps } from '../lib/types';
 
 export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [useMockData, setUseMockData] = useState(false);
 
-  const loadPosts = useCallback(async () => {
+  const loadPosts = useCallback(async (useMock = false) => {
     try {
       setLoading(true);
       setError(null);
+      setErrorDetails(null);
       
+      if (useMock) {
+        // Use mock data if specified
+        const mockPosts = await fetchMockInstagramPosts();
+        setPosts(mockPosts);
+        setUseMockData(true);
+        return;
+      }
+      
+      // Use real Instagram API
       const instagramPosts = await fetchInstagramPosts();
       
       if (instagramPosts && instagramPosts.length > 0) {
         setPosts(instagramPosts);
+        setUseMockData(false);
       } else {
         setError('No Instagram posts found');
       }
     } catch (err) {
       console.error('Error fetching Instagram posts:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError('Could not load Instagram posts');
+      setErrorDetails(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -54,56 +70,110 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
 
   if (error) {
     return (
-      <div className="text-center p-4">
+      <div className="text-center p-4 max-w-lg mx-auto">
         <div className="text-red-600 dark:text-red-400 mb-4">
-          {error}
+          <h3 className="text-lg font-medium mb-2">{error}</h3>
+          
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            {showDetails ? 'Hide details' : 'Show details'}
+          </button>
+          
+          {showDetails && errorDetails && (
+            <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 text-left text-xs text-gray-700 dark:text-gray-300 rounded">
+              {errorDetails}
+            </pre>
+          )}
         </div>
+        
+        <div className="flex flex-col sm:flex-row justify-center gap-3">
+          <button
+            onClick={() => loadPosts()}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+          >
+            Try Again
+          </button>
+          
+          {!useMockData && (
+            <button
+              onClick={() => loadPosts(true)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+            >
+              Use Sample Content
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return renderPlaceholder();
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="text-center p-4">
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          No Instagram posts found.
+        </p>
         
         <button
           onClick={() => loadPosts()}
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
         >
-          Retry
+          Try Again
         </button>
       </div>
     );
   }
 
-  if (loading || posts.length === 0) {
-    return renderPlaceholder();
-  }
-
   return (
-    <div 
-      className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 ${className}`.trim()}
-      role="feed"
-      aria-label="Instagram posts"
-    >
-      {posts.map((post) => (
-        <a 
-          key={post.id}
-          href={post.permalink}
-          className="aspect-square group relative"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src={post.media_url}
-            alt={post.caption || 'Instagram post'}
-            className="w-full h-full object-cover rounded-lg transition-transform group-hover:scale-[1.02]"
-            loading="lazy"
-            onLoad={() => console.log("Image loaded:", post.id)}
-            onError={(e) => {
-              console.error("Image failed to load:", post.id, post.media_url);
-              e.currentTarget.src = '/images/placeholder.jpg';
-            }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg">
-            <Instagram className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
-          </div>
-        </a>
-      ))}
-    </div>
+    <>
+      {useMockData && (
+        <div className="mb-4 p-3 bg-yellow-100 dark:bg-yellow-900 rounded-md text-yellow-800 dark:text-yellow-200 text-sm">
+          <p>Displaying sample content. Instagram connection is currently unavailable.</p>
+          <button
+            onClick={() => loadPosts()}
+            className="text-blue-600 dark:text-blue-400 underline mt-1"
+          >
+            Try loading real content
+          </button>
+        </div>
+      )}
+      
+      <div 
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 ${className}`.trim()}
+        role="feed"
+        aria-label="Instagram posts"
+      >
+        {posts.map((post) => (
+          <a 
+            key={post.id}
+            href={post.permalink}
+            className="aspect-square group relative"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={post.media_url}
+              alt={post.caption || 'Instagram post'}
+              className="w-full h-full object-cover rounded-lg transition-transform group-hover:scale-[1.02]"
+              loading="lazy"
+              onError={(e) => {
+                console.error("Image failed to load:", post.id, post.media_url);
+                e.currentTarget.src = '/images/placeholder.jpg';
+              }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg">
+              <Instagram className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
+            </div>
+          </a>
+        ))}
+      </div>
+    </>
   );
 };
 
