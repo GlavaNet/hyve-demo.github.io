@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
 
-// This is a simplified version of the Instagram Debugger component
+// Ultra simple version to avoid any TypeScript errors
 export const InstagramDebugger = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
@@ -17,6 +16,7 @@ export const InstagramDebugger = () => {
           success: false,
           message: 'No Instagram token found in environment variables'
         });
+        setLoading(false);
         return;
       }
       
@@ -42,6 +42,7 @@ export const InstagramDebugger = () => {
           message: 'Failed to parse token debug response',
           data: debugData
         });
+        setLoading(false);
         return;
       }
       
@@ -64,6 +65,7 @@ export const InstagramDebugger = () => {
           message: 'Failed to parse Instagram API response',
           data: { tokenInfo, mediaData }
         });
+        setLoading(false);
         return;
       }
       
@@ -74,6 +76,7 @@ export const InstagramDebugger = () => {
           message: `Instagram API error: ${instagramData.error.message}`,
           data: { tokenInfo, instagramData }
         });
+        setLoading(false);
         return;
       }
       
@@ -99,12 +102,9 @@ export const InstagramDebugger = () => {
     <div className="max-w-2xl mx-auto p-4 my-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
       <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Instagram Connection Debugger</h2>
       
-      <div className="flex items-center mb-4">
-        <AlertCircle size={18} className="text-yellow-500 mr-2" />
-        <p className="text-sm text-gray-600 dark:text-gray-300">
-          Use this tool to test your Instagram token and diagnose connection issues.
-        </p>
-      </div>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+        Use this tool to test your Instagram token and diagnose connection issues.
+      </p>
       
       <button
         onClick={runTest}
@@ -123,7 +123,7 @@ export const InstagramDebugger = () => {
           <div className={`p-3 rounded-md ${
             results.success ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
           }`}>
-            <p className="font-medium">{results.success ? '✅ Success' : '❌ Error'}</p>
+            <p className="font-medium">{results.success ? 'Success' : 'Error'}</p>
             <p>{results.message}</p>
           </div>
           

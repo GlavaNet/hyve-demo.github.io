@@ -27,10 +27,7 @@ const App = () => {
       }`}>
         {page === 'home' && (
           <>
-            {/* Instagram Debugger component for troubleshooting */}
             <InstagramDebugger />
-            
-            {/* Regular Instagram grid component */}
             <InstagramGrid />
           </>
         )}
