@@ -1,6 +1,6 @@
 import { InstagramPost } from './types';
 
-// Alternative approach using Basic Display API
+// Specialized implementation for Instagram Basic Display API tokens (IGAA tokens)
 export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
   const token = import.meta.env.VITE_INSTAGRAM_TOKEN;
   
@@ -9,14 +9,20 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
     return [];
   }
   
+  // Check if we have a Basic Display API token (IGAA)
+  const isBasicDisplayToken = token.startsWith('IGAA');
+  console.log(`Using ${isBasicDisplayToken ? 'Instagram Basic Display API' : 'Facebook Graph API'} token`);
+  
   try {
     console.log('Attempting to fetch Instagram posts...');
     
-    // This approach uses the /me endpoint instead of a specific user ID
-    // This works for tokens from the Instagram Basic Display API
-    const instagramUrl = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`;
+    // For Basic Display API tokens, we use the /me endpoint
+    // Note: userId is NOT needed for Basic Display API
+    const instagramUrl = isBasicDisplayToken
+      ? `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`
+      : `https://graph.instagram.com/v13.0/${import.meta.env.VITE_INSTAGRAM_USER_ID}/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink&access_token=${token}&limit=12`;
     
-    // Use the corsproxy.io service that worked in testing
+    // Use the corsproxy.io service
     const corsProxy = 'https://corsproxy.io/?';
     const proxyUrl = `${corsProxy}${encodeURIComponent(instagramUrl)}`;
     
@@ -26,7 +32,7 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
     if (!response.ok) {
       console.error(`Instagram API responded with status: ${response.status}`);
       
-      // If we got a 400 error, try to parse the response body to get more details
+      // Try to get more detailed error information
       try {
         const errorData = await response.json();
         if (errorData.error) {
@@ -34,8 +40,7 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
           throw new Error(`Instagram API error: ${errorData.error.message}`);
         }
       } catch (parseError) {
-        // If we can't parse the error response, just throw the original error
-        throw new Error(`Instagram API responded with status: ${response.status}`);
+        // If we can't parse the error, just use the status code
       }
       
       throw new Error(`Instagram API responded with status: ${response.status}`);
@@ -43,7 +48,7 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
     
     const data = await response.json();
     
-    // Check for auth errors specifically to provide better feedback
+    // Check for API errors
     if (data.error) {
       console.error('Instagram API error:', data.error);
       throw new Error(`Instagram API error: ${data.error.message}`);
@@ -59,13 +64,12 @@ export const fetchInstagramPosts = async (): Promise<InstagramPost[]> => {
     return data.data || [];
   } catch (error) {
     console.error('Error fetching Instagram posts:', error);
-    throw error; // Re-throw to let the component handle it
+    throw error;
   }
 };
 
-// Fallback implementation with mock data if needed
+// Fallback implementation with mock data
 export const fetchMockInstagramPosts = async (): Promise<InstagramPost[]> => {
-  // This function provides mock data for testing when the Instagram API is not available
   console.log('Using mock Instagram data');
   
   // Simulate API latency
