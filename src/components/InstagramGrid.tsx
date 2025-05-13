@@ -11,6 +11,15 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [useMockData, setUseMockData] = useState(false);
 
+  // Function to create inline SVG placeholder content
+  const generateSVGPlaceholder = (index: number) => {
+    // Generate a unique but consistent hue for each placeholder
+    const hue = (index * 55) % 360;
+    
+    // Create an inline SVG data URL
+    return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='hsl(${hue}, 70%25, 80%25)' /%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' fill='hsl(${hue}, 90%25, 30%25)' text-anchor='middle' dominant-baseline='middle'%3ESample ${index + 1}%3C/text%3E%3C/svg%3E`;
+  };
+
   const loadPosts = useCallback(async (useMock = false) => {
     try {
       setLoading(true);
@@ -18,10 +27,26 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
       setErrorDetails(null);
       
       if (useMock) {
-        // Use mock data if specified
-        const mockPosts = await fetchMockInstagramPosts();
-        setPosts(mockPosts);
-        setUseMockData(true);
+        try {
+          // Use mock data if specified
+          const mockPosts = await fetchMockInstagramPosts();
+          setPosts(mockPosts);
+          setUseMockData(true);
+        } catch (mockError) {
+          console.error('Error loading mock data:', mockError);
+          
+          // Create fully inline fallback if mock images also fail
+          const inlineMockPosts: InstagramPost[] = Array.from({ length: 6 }, (_, i) => ({
+            id: `inline-mock-${i}`,
+            media_type: 'IMAGE',
+            media_url: generateSVGPlaceholder(i),
+            permalink: '#' + i,
+            caption: `Sample content ${i + 1}`
+          }));
+          
+          setPosts(inlineMockPosts);
+          setUseMockData(true);
+        }
         return;
       }
       
@@ -71,8 +96,8 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
   if (error) {
     return (
       <div className="text-center p-4 max-w-lg mx-auto">
-        <div className="text-red-600 dark:text-red-400 mb-4">
-          <h3 className="text-lg font-medium mb-2">{error}</h3>
+        <div className="mb-4">
+          <h3 className="text-lg font-medium mb-2 text-red-600 dark:text-red-400">{error}</h3>
           
           <button
             onClick={() => setShowDetails(!showDetails)}
@@ -149,7 +174,7 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
         role="feed"
         aria-label="Instagram posts"
       >
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <a 
             key={post.id}
             href={post.permalink}
@@ -164,7 +189,8 @@ export const InstagramGrid = ({ className = '' }: InstagramGridProps) => {
               loading="lazy"
               onError={(e) => {
                 console.error("Image failed to load:", post.id, post.media_url);
-                e.currentTarget.src = '/images/placeholder.jpg';
+                // Use our SVG generator as fallback
+                e.currentTarget.src = generateSVGPlaceholder(index);
               }}
             />
             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg">
